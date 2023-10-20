@@ -15,12 +15,10 @@ import { Note } from "./data/db/Note";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
 const dao = new NoteDao();
 
+// note create and edit screen
 function NoteCreateView({ route, navigation }) {
 
   const { note } = route.params;
@@ -29,7 +27,7 @@ function NoteCreateView({ route, navigation }) {
 
   function save(){
     const item = new Note(titleState, bodyState)
-    if (note.id == -1 ){
+    if (note.id != -1) {
       item.id = note.id
     }
     return dao.insert(item)
@@ -59,6 +57,7 @@ function NoteCreateView({ route, navigation }) {
 function NoteListView({ navigation }) {
 
   const [notes, setNotes] = useState<Note[]>([]);
+
   dao.getAll().then((data) => {
     setNotes(data);
   });
