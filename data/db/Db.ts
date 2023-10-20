@@ -4,13 +4,15 @@ import {Alert} from 'react-native';
 import { Note } from "./Note";
 
 export const getDBConnection = async () => {
-  return openDatabase({ name: 'notes.db'});
+  const connection = await openDatabase({ name: 'notes.db'});
+  await createTable(connection)
+  return connection
 };
 
 enablePromise(true);
 
 export const createTable = async (db: SQLiteDatabase)=> {
-  await db.executeSql('CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR, body VARCHAR)')
+ await db.executeSql('CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR, body VARCHAR)')
 }
 
 export const getNotes = async (db: SQLiteDatabase): Promise<Note[]> => {
@@ -31,7 +33,6 @@ export const getNotes = async (db: SQLiteDatabase): Promise<Note[]> => {
 
 export const getNoteById = async (db: SQLiteDatabase, id: Number) => {
   const query = 'SELECT * FROM notes WHERE id = ?'
-  let note: ResultSet
   const result = (await db.executeSql(query, [id]))[0]
   return result.rows.item(0) as Note
 }

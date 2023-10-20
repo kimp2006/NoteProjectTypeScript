@@ -5,10 +5,6 @@ import { createNotesTable } from "./AppDb";
 
 export class NoteDao {
 
-  constructor() {
-    createNotesTable()
-  }
-
   async getAll(): Promise<Note[]> {
     return await getNotes(await getDBConnection())
   }
@@ -24,6 +20,7 @@ export class NoteDao {
   async delete(id: number) {
     await deleteNote(await getDBConnection(), id)
   }
+
 
 
 }

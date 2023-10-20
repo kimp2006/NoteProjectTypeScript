@@ -10,7 +10,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import type { PropsWithChildren } from "react";
 import {
   Alert,
-  Button,
+  Button, FlatList,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -30,6 +30,7 @@ import {
 } from "react-native/Libraries/NewAppScreen";
 import { NoteDao } from "./data/db/NoteDao";
 import { Note } from "./data/db/Note";
+import { createTable, getDBConnection } from "./data/db/Db";
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -60,6 +61,20 @@ function NoteCreateView({ id, title, body }: NoteProps): ReactElement {
   );
 }
 
+function NoteListView(): ReactElement {
+
+  const [notes, setNotes] = useState<Note[]>([])
+
+  dao.getAll().then((data) => {
+    setNotes(data)
+  })
+
+  return (
+    <FlatList data={notes} renderItem={({item})=> <Text>{item.body}</Text>}/>
+  )
+
+}
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -73,13 +88,7 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View style={styles.container}>
-          <NoteCreateView id={0} title={"test"} body={"sdf"} />
-        </View>
-      </ScrollView>
+      <NoteListView/>
     </SafeAreaView>
   );
 }
