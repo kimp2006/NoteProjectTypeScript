@@ -6,31 +6,13 @@
  * @format
  */
 import "react-native-gesture-handler";
-import React, { ReactElement, useEffect, useState } from "react";
 import type { PropsWithChildren } from "react";
-import {
-  Alert,
-  Button, FlatList, Image, Pressable,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput, TouchableHighlight, TouchableOpacityComponent,
-  useColorScheme,
-  View
-} from "react-native";
+import React, { useState } from "react";
+import { Button, FlatList, Pressable, StyleSheet, Text, TextInput, TouchableHighlight, View } from "react-native";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions
-} from "react-native/Libraries/NewAppScreen";
 import { NoteDao } from "./data/db/NoteDao";
 import { Note } from "./data/db/Note";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 type SectionProps = PropsWithChildren<{
