@@ -38,39 +38,36 @@ type SectionProps = PropsWithChildren<{
 }>;
 
 const dao = new NoteDao();
+
 function NoteCreateView({ route, navigation }) {
 
-  const { id } = route.params;
-  const [titleState, setTitle] = useState("");
-  const [bodyState, setBody] = useState("");
+  const { note } = route.params;
+  const [titleState, setTitle] = useState(note.title);
+  const [bodyState, setBody] = useState(note.body);
 
-  if (id >= 0) {
-    dao.getById(id).then((note) => {
-      setTitle(note.title);
-      setBody(note.body);
-    });
-  }
-
-  function saveOrUpdate(){
-    const note = new Note(titleState, bodyState)
-    if (id >= 0){
-      note.id = id
+  function save(){
+    const item = new Note(titleState, bodyState)
+    if (note.id == -1 ){
+      item.id = note.id
     }
-      return dao.insert(note)
-
+    return dao.insert(item)
   }
+
 
   return (
     <View style={styles.container}>
-      <TextInput style={styles.titleInputStyle} placeholder={"Title"} placeholderTextColor={"#8a8a8a"} onChangeText={setTitle}>
-        {titleState}
-      </TextInput>
-      <TextInput style={styles.bodyInputStyle} placeholderTextColor={"#8a8a8a"} multiline placeholder={"Body"} onChangeText={setBody}>
-        {bodyState}
-      </TextInput>
+      <TextInput style={styles.titleInputStyle} placeholder={"Title"} placeholderTextColor={"#8a8a8a"}
+                 value={titleState} onChangeText={setTitle}/>
+      <TextInput style={styles.bodyInputStyle} placeholderTextColor={"#8a8a8a"} multiline placeholder={"Body"}
+                 value={bodyState} onChangeText={setBody}/>
       <Button
         title={"Create"}
-        onPress={() => saveOrUpdate().then(() => navigation.goBack())}
+        onPress={() => save().then(() => navigation.goBack())}
+      />
+      <View style={{margin: 10}}></View>
+      <Button
+        title={"Delete"}
+        onPress={() => dao.delete(note.id).then(() => navigation.goBack())}
       />
     </View>
   );
@@ -86,7 +83,7 @@ function NoteListView({ navigation }) {
 
   const renderItem = ({ item }) =>
     <View>
-      <TouchableHighlight onPress={() => navigation.navigate("NoteScreen", { id: item.id })}>
+      <TouchableHighlight onPress={() => navigation.navigate("NoteScreen", { note: item })}>
         <View style={styles.noteItemStyle}>
           <Text style={styles.tittleStyle}>{item.title}</Text>
           <Text style={styles.bodyStyle}>{item.body}</Text>
@@ -101,20 +98,21 @@ function NoteListView({ navigation }) {
   return (
     <View style={styles.container}>
       <FlatList data={notes} renderItem={renderItem} keyExtractor={key} />
-      <FloatingButton click={() => navigation.navigate("NoteScreen", { id: -999 })}></FloatingButton>
+      <FloatingButton click={() => navigation.navigate("NoteScreen", { note: new Note("", "") })}></FloatingButton>
     </View>
   );
 }
 
 
-type FloatingButtonProps = PropsWithChildren<{click: Function}>
-function FloatingButton({click}: FloatingButtonProps){
+type FloatingButtonProps = PropsWithChildren<{ click: Function }>
+
+function FloatingButton({ click }: FloatingButtonProps) {
 
   return (
     <Pressable style={styles.floatingBtnStyle} onPress={() => click()}>
-      <Text>{'Add'}</Text>
+      <Text>{"Add"}</Text>
     </Pressable>
-  )
+  );
 }
 
 
@@ -125,11 +123,6 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === "dark";
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter
-  };
 
   return (
     <NavigationContainer>
@@ -182,7 +175,7 @@ const styles = StyleSheet.create({
   titleInputStyle: {
     color: "#000000",
     backgroundColor: "#ffffff",
-    marginBottom: 8,
+    marginBottom: 8
   },
   bodyInputStyle: {
     height: 300,
@@ -191,7 +184,7 @@ const styles = StyleSheet.create({
     marginBottom: 16
   },
   floatingBtnStyle: {
-    display: 'flex',
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",

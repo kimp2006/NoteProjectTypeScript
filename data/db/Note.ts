@@ -6,7 +6,7 @@ export class Note{
   private _body: string;
 
   constructor(title: string, body: string) {
-    this._id = -999
+    this._id = -1
     this._body = body;
     this._title = title
   }

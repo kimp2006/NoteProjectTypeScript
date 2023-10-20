@@ -37,8 +37,8 @@ export const getNoteById = async (db: SQLiteDatabase, id: Number) => {
   return result.rows.item(0) as Note
 }
 export const saveNote = async (db: SQLiteDatabase, note: Note) => {
-  const insertQuery = 'INSERT OR REPLACE INTO notes (title, body)  values (?,?)'
-  return db.executeSql(insertQuery, [note.title, note.body]);
+  const insertQuery = 'INSERT OR REPLACE INTO notes (id, title, body)  values (?,?,?)'
+  return db.executeSql(insertQuery, [note.id, note.title, note.body]);
 };
 
 export const deleteNote = async (db: SQLiteDatabase, id: number) => {
