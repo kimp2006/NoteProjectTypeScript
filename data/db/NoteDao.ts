@@ -14,7 +14,7 @@ export class NoteDao {
   }
 
   async insert(note: Note){
-    await saveNote(await getDBConnection(), note)
+    return await saveNote(await getDBConnection(), note)
   }
 
   async delete(id: number) {
