@@ -5,7 +5,7 @@
  *
  * @format
  */
-
+import 'react-native-gesture-handler';
 import React, { ReactElement, useEffect, useState } from "react";
 import type { PropsWithChildren } from "react";
 import {
@@ -30,7 +30,8 @@ import {
 } from "react-native/Libraries/NewAppScreen";
 import { NoteDao } from "./data/db/NoteDao";
 import { Note } from "./data/db/Note";
-import { createTable, getDBConnection } from "./data/db/Db";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -39,10 +40,18 @@ type SectionProps = PropsWithChildren<{
 const dao = new NoteDao()
 type NoteProps = PropsWithChildren<{id: number; title: string; body: string}>;
 
-function NoteCreateView({ id, title, body }: NoteProps): ReactElement {
+function NoteCreateView({route, navigation}) {
 
-  const [titleState, setTitle] = useState(title);
-  const [bodyState, setBody] = useState(body);
+  const {id} = route.params
+  const [titleState, setTitle] = useState("");
+  const [bodyState, setBody] = useState("");
+
+  if (id >= 0) {
+    dao.getById(id).then((note) => {
+      setTitle(note.title)
+      setBody(note.body)
+    })
+  }
 
   return (
     <View>
@@ -50,7 +59,7 @@ function NoteCreateView({ id, title, body }: NoteProps): ReactElement {
         {titleState}
       </TextInput>
       <TextInput multiline placeholder={'Body'} onChangeText={setBody}>
-        {body}
+        {bodyState}
       </TextInput>
       <Button
         title={'Create'}
@@ -61,7 +70,7 @@ function NoteCreateView({ id, title, body }: NoteProps): ReactElement {
   );
 }
 
-function NoteListView(): ReactElement {
+function NoteListView({navigation}) {
 
   const [notes, setNotes] = useState<Note[]>([])
 
@@ -70,10 +79,17 @@ function NoteListView(): ReactElement {
   })
 
   return (
-    <FlatList data={notes} renderItem={({item})=> <Text>{item.body}</Text>}/>
+    <Button title={"next"} onPress={() => navigation.navigate('NoteScreen')}/>
   )
 
 }
+
+
+export type RootStackParamList = {
+  NotesListScreen: undefined;
+  NoteScreen: undefined;
+};
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -84,11 +100,12 @@ function App(): JSX.Element {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? "light-content" : "dark-content"}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <NoteListView/>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={'NotesListScreen'}>
+          <Stack.Screen name={'NotesListScreen'} component={NoteListView}/>
+          <Stack.Screen name={'NoteScreen'} component={NoteCreateView}/>
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
   );
 }
