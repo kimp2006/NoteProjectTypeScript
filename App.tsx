@@ -7,16 +7,28 @@
  */
 import "react-native-gesture-handler";
 import type { PropsWithChildren } from "react";
-import React, { useState } from "react";
-import { Button, FlatList, Pressable, StyleSheet, Text, TextInput, TouchableHighlight, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Button,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View
+} from "react-native";
 
 import { NoteDao } from "./data/db/NoteDao";
 import { Note } from "./data/db/Note";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NoteRepository } from "./data/NoteRepository";
+import { FirebaseNoteDb } from "./data/firebase/db";
 
 
-const dao = new NoteDao();
+const repository = new NoteRepository(new NoteDao(), new FirebaseNoteDb());
 
 // note create and edit screen
 function NoteCreateView({ route, navigation }) {
@@ -25,29 +37,31 @@ function NoteCreateView({ route, navigation }) {
   const [titleState, setTitle] = useState(note.title);
   const [bodyState, setBody] = useState(note.body);
 
-  function save(){
-    const item = new Note(titleState, bodyState)
-    if (note.id != -1) {
-      item.id = note.id
-    }
-    return dao.insert(item)
+  function save() {
+    note.title = titleState;
+    note.body = bodyState;
+    return repository.insertOrUpdate(note);
   }
 
 
   return (
     <View style={styles.container}>
       <TextInput style={styles.titleInputStyle} placeholder={"Title"} placeholderTextColor={"#8a8a8a"}
-                 value={titleState} onChangeText={setTitle}/>
+                 value={titleState} onChangeText={setTitle} />
       <TextInput style={styles.bodyInputStyle} placeholderTextColor={"#8a8a8a"} multiline placeholder={"Body"}
-                 value={bodyState} onChangeText={setBody}/>
+                 value={bodyState} onChangeText={setBody} />
       <Button
         title={"Create"}
-        onPress={() => save().then(() => navigation.goBack())}
+        onPress={() => save()
+          .catch((e) => Alert.alert("Server error", e))
+          .finally(() => navigation.goBack())}
       />
-      <View style={{margin: 10}}></View>
+      <View style={{ margin: 10 }}></View>
       <Button
         title={"Delete"}
-        onPress={() => dao.delete(note.id).then(() => navigation.goBack())}
+        onPress={() => repository.delete(note)
+          .catch((e) => Alert.alert("Server error", e))
+          .finally(() => navigation.goBack())}
       />
     </View>
   );
@@ -58,9 +72,13 @@ function NoteListView({ navigation }) {
 
   const [notes, setNotes] = useState<Note[]>([]);
 
-  dao.getAll().then((data) => {
-    setNotes(data);
-  });
+  repository.getAll()
+    .then((data) => {
+      setNotes(data);
+    })
+    .catch(e => {
+      Alert.alert("Unknown error");
+    });
 
   const renderItem = ({ item }) =>
     <View>
@@ -104,6 +122,16 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
+
+  useEffect(() => {
+    repository.synchronized()
+      .then(() => {
+
+      })
+      .catch((e) => {
+
+      });
+  });
 
   return (
     <NavigationContainer>

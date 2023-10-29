@@ -1,6 +1,5 @@
 /* eslint-disable */
-import { enablePromise, openDatabase, ResultSet, SQLiteDatabase } from "react-native-sqlite-storage";
-import {Alert} from 'react-native';
+import { enablePromise, openDatabase, SQLiteDatabase } from "react-native-sqlite-storage";
 import { Note } from "./Note";
 
 export const getDBConnection = async () => {
@@ -41,9 +40,9 @@ export const saveNote = async (db: SQLiteDatabase, note: Note) => {
   return db.executeSql(insertQuery, [note.id, note.title, note.body]);
 };
 
-export const deleteNote = async (db: SQLiteDatabase, id: number) => {
+export const deleteNote = async (db: SQLiteDatabase, note: Note) => {
   const deleteQuery = 'DELETE from notes where id = ?';
-  await db.executeSql(deleteQuery, [id]);
+  await db.executeSql(deleteQuery, [note.id]);
 };
 
 export const deleteTable = async (db: SQLiteDatabase) => {
