@@ -3,20 +3,19 @@
 import { initializeApp } from "firebase/app";
 import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from "firebase/firestore";
 import { Note } from "../db/Note";
-import firebase from "firebase/compat";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD87uQ-Ea4DHP4VCPnd1LGQZFlxe-wKsyk",
-  authDomain: "noteapp-95fb0.firebaseapp.com",
-  projectId: "noteapp-95fb0",
-  storageBucket: "noteapp-95fb0.appspot.com",
-  messagingSenderId: "1021996082919",
-  appId: "1:1021996082919:web:7b9f398ac615f2eb4ba442",
-  measurementId: "G-7YDGS1L72X"
+  apiKey: "AIzaSyBfC4gcSXFkpMg-rS-k40FoqgDdZKS8CDY",
+  authDomain: "noteapp-31e16.firebaseapp.com",
+  projectId: "noteapp-31e16",
+  storageBucket: "noteapp-31e16.appspot.com",
+  messagingSenderId: "828144550903",
+  appId: "1:828144550903:web:0f243ffddbe8993c0ee4f2",
+  measurementId: "G-5NL8L97DVX"
 };
 
 // Initialize Firebase
